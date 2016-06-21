@@ -1,5 +1,7 @@
 warc: Python library to work with WARC files
-============================================
+===========================================
+
+Repository under construction for Python 3 Compatability
 
 .. image:: https://secure.travis-ci.org/anandology/warc.png?branch=master
    :alt: build status

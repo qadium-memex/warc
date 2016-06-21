@@ -1,8 +1,11 @@
+from builtins import str
+from builtins import range
+from builtins import object
 from ..warc import WARCReader, WARCHeader, WARCRecord, WARCFile
 
-from StringIO import StringIO
+from io import StringIO, BytesIO
 
-class TestWARCHeader:
+class TestWARCHeader(object):
     def test_attrs(self):
         h = WARCHeader({
             "WARC-Type": "response",
@@ -65,9 +68,9 @@ SAMPLE_WARC_RECORD_TEXT = (
     "\r\n\r\n"
 )
 
-class TestWARCReader:
+class TestWARCReader(object):
     def test_read_header1(self):
-        f = StringIO(SAMPLE_WARC_RECORD_TEXT)
+        f = BytesIO(SAMPLE_WARC_RECORD_TEXT)
         h = WARCReader(f).read_record().header
         assert h.date == "2012-02-10T16:15:52Z"
         assert h.record_id == "<urn:uuid:80fb9262-5402-11e1-8206-545200690126>"
@@ -75,31 +78,31 @@ class TestWARCReader:
         assert h.content_length == 10
 
     def test_empty(self):
-        reader = WARCReader(StringIO(""))
+        reader = WARCReader(BytesIO(""))
         assert reader.read_record() is None
 
     def test_read_record(self):
-        f = StringIO(SAMPLE_WARC_RECORD_TEXT)
+        f = BytesIO(SAMPLE_WARC_RECORD_TEXT)
         reader = WARCReader(f)
         record = reader.read_record()
         assert "".join(record.payload) == "Helloworld"
 
     def read_multiple_records(self):
-        f = StringIO(SAMPLE_WARC_RECORD_TEXT * 5)
+        f = BytesIO(SAMPLE_WARC_RECORD_TEXT * 5)
         reader = WARCReader(f)
         for i in range(5):
             rec = reader.read_record()
             assert rec is not None
 
-class TestWarcFile:
+class TestWarcFile(object):
     def test_read(self):
-        f = WARCFile(fileobj=StringIO(SAMPLE_WARC_RECORD_TEXT))
+        f = WARCFile(fileobj=BytesIO(SAMPLE_WARC_RECORD_TEXT))
         assert f.read_record() is not None
         assert f.read_record() is None
 
     def test_write_gz(self):
         """Test writing multiple member gzip file."""
-        buffer = StringIO()
+        buffer = BytesIO()
         f = WARCFile(fileobj=buffer, mode="w", compress=True)
         for i in range(10):
             record = WARCRecord(payload="hello %d" % i)
