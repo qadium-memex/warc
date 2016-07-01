@@ -1,6 +1,6 @@
 """Enhanced gzip library to support multiple member gzip files.
 
-GZIP has an interesting property that contatination of mutliple gzip files is a valid gzip file.
+GZIP has an interesting property that concatenation of multiple gzip files is a valid gzip file.
 In other words, a gzip file can have multiple members, each individually gzip
 compressed. The members simply appear one after another in the file, with no
 additional information before, between, or after them.
@@ -21,8 +21,10 @@ def open(filename, mode="rb", compresslevel=9):
     return GzipFile(filename, mode, compresslevel)
 
 class GzipFile(BaseGzipFile):
-    """GzipFile with support for multi-member gzip files.
     """
+    GzipFile with support for multi-member gzip files.
+    """
+    _new_member = False
     def __init__(self, filename=None, mode=None,
                  compresslevel=9, fileobj=None):
         BaseGzipFile.__init__(self,

@@ -105,10 +105,10 @@ class TestWarcFile(object):
 
     def test_write_gz(self):
         """Test writing multiple member gzip file."""
-        buffer = BytesIO()
+        buffer = StringIO()
         f = warc.WARCFile(fileobj=buffer, mode="w", compress=True)
         for i in range(10):
-            record = warc.WARCRecord(payload=b"hello %d" % i)
+            record = warc.WARCRecord(payload="hello %d" % i)
             f.write_record(record)
 
         GZIP_MAGIC_NUMBER = '\037\213'
