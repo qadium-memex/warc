@@ -6,3 +6,8 @@ build/
 htmlcov/
 venv
 dist
+venv_pypy
+.idea
+.cache
+.ipynb_checkpoints
+*.ipynb
