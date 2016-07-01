@@ -3,7 +3,7 @@ from builtins import range
 from builtins import object
 from ..warc import WARCReader, WARCHeader, WARCRecord, WARCFile
 
-from io import StringIO, BytesIO
+from io import StringIO
 
 class TestWARCHeader(object):
     def test_attrs(self):
@@ -56,21 +56,21 @@ class TestWARCHeader(object):
         assert f("newtype")["Content-Type"] == "application/octet-stream"
 
 SAMPLE_WARC_RECORD_TEXT = (
-    b"WARC/1.0\r\n" +
-    b"Content-Length: 10\r\n" +
-    b"WARC-Date: 2012-02-10T16:15:52Z\r\n" +
-    b"Content-Type: application/http; msgtype=response\r\n" +
-    b"WARC-Type: response\r\n" +
-    b"WARC-Record-ID: <urn:uuid:80fb9262-5402-11e1-8206-545200690126>\r\n" +
-    b"WARC-Target-URI: http://example.com/\r\n" +
-    b"\r\n" +
-    b"Helloworld" +
-    b"\r\n\r\n"
+    "WARC/1.0\r\n" +
+    "Content-Length: 10\r\n" +
+    "WARC-Date: 2012-02-10T16:15:52Z\r\n" +
+    "Content-Type: application/http; msgtype=response\r\n" +
+    "WARC-Type: response\r\n" +
+    "WARC-Record-ID: <urn:uuid:80fb9262-5402-11e1-8206-545200690126>\r\n" +
+    "WARC-Target-URI: http://example.com/\r\n" +
+    "\r\n" +
+    "Helloworld" +
+    "\r\n\r\n"
 )
 
 class TestWARCReader(object):
     def test_read_header1(self):
-        f = BytesIO(bytes(SAMPLE_WARC_RECORD_TEXT))
+        f = StringIO(SAMPLE_WARC_RECORD_TEXT)
         h = WARCReader(f).read_record().header
         assert h.date == "2012-02-10T16:15:52Z"
         assert h.record_id == "<urn:uuid:80fb9262-5402-11e1-8206-545200690126>"
@@ -78,17 +78,17 @@ class TestWARCReader(object):
         assert h.content_length == 10
 
     def test_empty(self):
-        reader = WARCReader(BytesIO(""))
+        reader = WARCReader(StringIO(""))
         assert reader.read_record() is None
 
     def test_read_record(self):
-        f = BytesIO(SAMPLE_WARC_RECORD_TEXT)
+        f = StringIO(SAMPLE_WARC_RECORD_TEXT)
         reader = WARCReader(f)
         record = reader.read_record()
         assert "".join(record.payload) == "Helloworld"
 
     def read_multiple_records(self):
-        f = BytesIO(SAMPLE_WARC_RECORD_TEXT * 5)
+        f = StringIO(SAMPLE_WARC_RECORD_TEXT * 5)
         reader = WARCReader(f)
         for i in range(5):
             rec = reader.read_record()
@@ -96,13 +96,13 @@ class TestWARCReader(object):
 
 class TestWarcFile(object):
     def test_read(self):
-        f = WARCFile(fileobj=BytesIO(SAMPLE_WARC_RECORD_TEXT))
+        f = WARCFile(fileobj=StringIO(SAMPLE_WARC_RECORD_TEXT))
         assert f.read_record() is not None
         assert f.read_record() is None
 
     def test_write_gz(self):
         """Test writing multiple member gzip file."""
-        buffer = BytesIO()
+        buffer = StringIO()
         f = WARCFile(fileobj=buffer, mode="w", compress=True)
         for i in range(10):
             record = WARCRecord(payload="hello %d" % i)
